@@ -4,6 +4,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const PurifyCSSPlugin = require('purifycss-webpack-plugin');
 const OpenBrowserWebpackPlugin = require('open-browser-webpack-plugin');
+const autoprefixer = require('autoprefixer');
 
 const DEFAULTS = {
   PORT: 8081,
@@ -92,11 +93,18 @@ exports.setupReactFlex = function () {
       loaders: [
         {
           test: /(\.scss|\.css)$/,
-        loader: ExtractTextPlugin.extract('style', 'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss!sass?sourceMap')
+          loader: ExtractTextPlugin.extract(
+            'style', 
+            'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss!sass?sourceMap'
+            )
           // include: /flexboxgrid/
         }
       ]
-    }
+    },
+    postcss: [autoprefixer],
+    plugins: [
+      new ExtractTextPlugin('example.css', { allChunks: true })
+    ]  
   };
 }
 
