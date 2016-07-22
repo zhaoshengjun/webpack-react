@@ -80,11 +80,25 @@ exports.setupCSS = function (paths) {
   return {
     module: {
       loaders: [
-        { test: /\.css$/, loaders: ['style', 'css'], include: paths }
+        { test: /\.css$/, loaders: ['style', 'css'], include: paths,exclude: /flexboxgrid/ }
       ]
     }
   };
 };
+
+exports.setupReactFlex = function () {
+  return {
+    module: {
+      loaders: [
+        {
+          test: /(\.scss|\.css)$/,
+        loader: ExtractTextPlugin.extract('style', 'css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss!sass?sourceMap')
+          // include: /flexboxgrid/
+        }
+      ]
+    }
+  };
+}
 
 exports.minify = function () {
   return {

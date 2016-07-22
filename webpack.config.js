@@ -20,82 +20,59 @@ const common = {
     path: PATHS.build,
     filename: '[name].js'
   },
+  resolve: {
+    extensions: ['', '.jsx', '.scss', '.js'],  // along the way, subsequent file(s) to be consumed by webpack
+    modulesDirectories: [
+      'node_modules',
+      path.resolve(__dirname, './node_modules')
+    ]
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'app/index.html'),
       filename: 'index.html',
       title: "Webpack Demo"
     })
-  ],
-  node: {
-    fs: false,
-    net: false,
-    tls: false
-  }
+  ]
 };
 
 var config;
 
-switch (process.env.npm_lifecycle_event) {
-  case 'build':
-    config = merge(
+var buildConfig = merge(
+  common,
+  parts.JSX(PATHS.app),
+  parts.setupReactFlex(),
+  // parts.JSON(),
+  // parts.Fonts(PATHS.app),
+  // parts.LESS(PATHS.app),
+  // parts.Images(PATHS.app),
+  {
+    devtool: 'source-map',
+    output: {
+      path: PATHS.build,
+      filename: '[name].[chunkhash].js',
+      chunkFilename: '[chunkhash].js'
+    }
+  },
+  parts.clean(PATHS.build),
+  parts.setFreeVariable('process.env.NODE_ENV', 'production'),
+  // parts.extractBundle({
+  //   name: 'vendor',
+  //   entries: Object.keys(pkg.dependencies)
+  // }),
+  parts.minify(),
+  parts.extractCSS(PATHS.style),
+  parts.purifyCSS([PATHS.app])
+);
+
+var devConfig = merge(
       common,
       parts.JSX(PATHS.app),
-      parts.JSON(),
-      parts.Fonts(PATHS.app),
-      parts.LESS(PATHS.app),
-      parts.Images(PATHS.app),
-      {
-        devtool: 'source-map',
-        output: {
-          path: PATHS.build,
-          filename: '[name].[chunkhash].js',
-          chunkFilename: '[chunkhash].js'
-        }
-      },
-      parts.clean(PATHS.build),
-      parts.setFreeVariable('process.env.NODE_ENV', 'production'),
-      parts.extractBundle({
-        name: 'vendor',
-        entries: Object.keys(pkg.dependencies)
-      }),
-      parts.minify(),
-      parts.extractCSS(PATHS.style),
-      parts.purifyCSS([PATHS.app])
-    );
-    break;
-  case 'stats':
-    config = merge(
-      common,
-      parts.JSX(PATHS.app),
-      parts.Images(PATHS.app),
-      {
-        devtool: 'source-map',
-        output: {
-          path: PATHS.build,
-          filename: '[name].[chunkhash].js',
-          chunkFilename: '[chunkhash].js'
-        }
-      },
-      parts.clean(PATHS.build),
-      parts.setFreeVariable('process.env.NODE_ENV', 'production'),
-      parts.extractBundle({
-        name: 'vendor',
-        entries: Object.keys(pkg.dependencies)
-      }),
-      parts.minify(),
-      parts.extractCSS(PATHS.style),
-      parts.purifyCSS([PATHS.app])
-    );
-    break;
-  default:
-    config = merge(
-      common,
-      parts.JSX(PATHS.app),
-      parts.JSON(),
-      parts.Fonts(PATHS.app),
-      parts.LESS(PATHS.app),
-      parts.Images(PATHS.app),
+      parts.setupReactFlex(),
+      // parts.JSON(),
+      // parts.Fonts(PATHS.app),
+      // parts.LESS(PATHS.app),
+      // parts.Images(PATHS.app),
       {
         devtool: 'eval-source-map'
       },
@@ -106,6 +83,16 @@ switch (process.env.npm_lifecycle_event) {
       }),
       parts.open
     );
+
+switch (process.env.npm_lifecycle_event) {
+  case 'build':
+    config = buildConfig;
+    break;
+  case 'stats':
+    config = buildConfig;
+    break;
+  default:
+    config = devConfig;
 }
 
 module.exports = validate(config);
