@@ -10,7 +10,6 @@ const fakeDatabase = {
 };
 
 const delay = (ms) => new Promise(resolve => {
-  console.log(resolve);
   setTimeout(resolve(), ms);
 });
 
