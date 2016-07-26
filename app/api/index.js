@@ -9,11 +9,15 @@ const fakeDatabase = {
   ]
 };
 
-// const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-// const delay = () => new Promise(resolve => setTimeout(resolve, 500));
+const delay = (ms) => new Promise(resolve => {
+  console.log(resolve);
+  setTimeout(resolve(), ms);
+});
 
-export const fetchTodos = (filter) => {
-  switch (filter) {
+export const fetchTodos = (filter) => 
+  delay(500)
+  .then(() => {
+    switch (filter) {
       case 'all':
         return fakeDatabase.todos;
       case 'completed':
@@ -22,5 +26,5 @@ export const fetchTodos = (filter) => {
         return fakeDatabase.todos.filter(t => !t.completed);
       default:
         throw new Error(`Unknow filter: ${filter}.`);
-    };
-};
+    }
+  });

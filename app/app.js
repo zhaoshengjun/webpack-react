@@ -7,11 +7,8 @@ import { configureStore } from './configureStore';
 import { Root } from './components/Root';
 import { fetchTodos } from './api';
 
-// fetchTodos('active')
-//   .then( todos => console.log(todos));
-
-// let todos = fetchTodos('active');
-// console.log(todos);
+fetchTodos('active')
+  .then( todos => console.log(todos));
 
 const store = configureStore();
 
