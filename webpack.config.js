@@ -41,11 +41,7 @@ var config;
 var buildConfig = merge(
   common,
   parts.JSX(PATHS.app),
-  parts.setupReactFlex(),
-  // parts.JSON(),
-  // parts.Fonts(PATHS.app),
-  // parts.LESS(PATHS.app),
-  // parts.Images(PATHS.app),
+  parts.setupReactFlex(),  
   {
     devtool: 'source-map',
     output: {
