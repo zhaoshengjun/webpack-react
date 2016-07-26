@@ -1,49 +1,56 @@
 import { createStore } from 'redux';
 import todoApp from './reducers';
 
-const addPromiseSupportToDispatch = (store) => {
-  const rawDispatch = store.dispatch;
-  return (action) => {
-    if (typeof action.then === 'function') {
-      return action.then(rawDispatch);
-    }
-    return rawDispatch(action);
-  };
+const promise = (store) => (next) => (action) => {
+  if (typeof action.then === 'function') {
+    return action.then(next);
+  }
+  return next(action);
 };
 
-const addLoggingToDispatch = (store) => {
-  const rawDispatch = store.dispatch;
+const logger = (store) => (next) => {
   if (!console.group) {
-    return rawDispatch;
+    return next;
   }
   return (action) => {
     console.group(action.type);
     console.log('%c prev state', 'color: gray', store.getState());
     console.log('%c action', 'color: blue', action);
-    const returnValue = rawDispatch(action);
+    const returnValue = next(action);
     console.log('%c next state', 'color: green', store.getState());
     console.groupEnd(action.type);
     return returnValue;
-  }
-}
+  };
+};
+
+const wrapDispatchWithMiddlewares = (store, middlewares) => {
+  middlewares.slice()
+    .reverse()
+    .forEach(middleware =>
+      store.dispatch = middleware(store)(store.dispatch)
+    );
+};
 
 const configureStore = () => {
   // let isProduction = process.env.NODE_ENV === 'production';
   let isProduction = false;
+  const middlewares = [promise];
 
-  let store;
+  let store = createStore(todoApp);
 
   if (!isProduction) {
-    store = createStore(
-      todoApp,
-      window.devToolsExtension && window.devToolsExtension()
-    );
-    store.dispatch = addLoggingToDispatch(store);
-  } else {
-    store = createStore(todoApp);
+    // store = createStore(
+    //   todoApp,
+    //   window.devToolsExtension && window.devToolsExtension()
+    // );
+    middlewares.push(logger);
+  // } else {
+  //   store = createStore(todoApp);
   }
 
-  store.dispatch = addPromiseSupportToDispatch(store);
+  // middlewares.push(promise);
+
+  wrapDispatchWithMiddlewares(store, middlewares);
   return store;
 }
 
