@@ -1,5 +1,7 @@
 import { v4 } from 'node-uuid';
 import * as api from '../api';
+import { getIsFetching } from '../reducers';
+
 
 const ADD_TODO = 'ADD_TODO';
 const TOGGLE_TODO = 'TOGGLE_TODO';
@@ -23,7 +25,11 @@ const receiveTodos = (filter,response) =>({
   response
 });
 
-const fetchTodos = (filter) => (dispatch) =>{
+const fetchTodos = (filter) => (dispatch, getState) =>{
+  if (getIsFetching(getState(), filter)) {
+    return Promise.resolve();
+  }
+
   dispatch(requestTodos(filter));
 
   return api.fetchTodos(filter)
