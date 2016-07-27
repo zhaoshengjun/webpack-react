@@ -5,43 +5,47 @@ import { getIsFetching } from '../reducers';
 
 const ADD_TODO = 'ADD_TODO';
 const TOGGLE_TODO = 'TOGGLE_TODO';
-const RECEIVE_TODOS = 'RECEIVE_TODOS';
-const REQUEST_TODOS = 'REQUEST_TODOS';
+const FETCH_TODOS_REQUEST = 'FETCH_TODOS_REQUEST';
+const FETCH_TODOS_SUCCESS = 'FETCH_TODOS_SUCCESS';
+const FETCH_TODOS_FAILURE = 'FETCH_TODOS_FAILURE';
 
 const addTodo = (text) => ({
-    type: ADD_TODO,
-    id: v4(),
-    text
-  });
-
-const toggleTodo = (id) => ({
-    type: TOGGLE_TODO,
-    id
-  });
-
-const receiveTodos = (filter,response) =>({
-  type:RECEIVE_TODOS,
-  filter,
-  response
+  type: ADD_TODO,
+  id: v4(),
+  text
 });
 
-const fetchTodos = (filter) => (dispatch, getState) =>{
+const toggleTodo = (id) => ({
+  type: TOGGLE_TODO,
+  id
+});
+
+
+const fetchTodos = (filter) => (dispatch, getState) => {
   if (getIsFetching(getState(), filter)) {
     return Promise.resolve();
   }
 
-  dispatch(requestTodos(filter));
+  dispatch({
+    type: FETCH_TODOS_REQUEST,
+    filter
+  });
 
   return api.fetchTodos(filter)
-      .then(response => {
-        dispatch(receiveTodos(filter, response));
+    .then(response => {
+      dispatch({
+        type: FETCH_TODOS_SUCCESS,
+        filter,
+        response
       });
+    }, err => {
+      dispatch({
+        type: FETCH_TODOS_FAILURE,
+        filter,
+        message: err.message || 'Something went wrong'
+      })
+    });
 }
 
-const requestTodos = (filter) => ({
-  type: REQUEST_TODOS,
-  filter
-})
-
-export {ADD_TODO, TOGGLE_TODO, RECEIVE_TODOS, REQUEST_TODOS};
-export { addTodo, toggleTodo, receiveTodos, fetchTodos};
+export {ADD_TODO, TOGGLE_TODO, FETCH_TODOS_REQUEST, FETCH_TODOS_FAILURE, FETCH_TODOS_SUCCESS};
+export { addTodo, toggleTodo,  fetchTodos};
