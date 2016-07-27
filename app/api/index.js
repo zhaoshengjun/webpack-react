@@ -10,11 +10,11 @@ const fakeDatabase = {
 };
 
 const delay = (ms) => new Promise(resolve => {
-  setTimeout(resolve(), ms);
+  setTimeout(resolve, ms);
 });
 
 export const fetchTodos = (filter) => 
-  delay(500)
+  delay(1000)
   .then(() => {
     switch (filter) {
       case 'all':
