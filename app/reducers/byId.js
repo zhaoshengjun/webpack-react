@@ -1,4 +1,4 @@
-import {  FETCH_TODOS_SUCCESS}  from '../actions';
+import {  FETCH_TODOS_SUCCESS, ADD_TODO_SUCCESS}  from '../actions';
 const byId = (state = {}, action) => {
   switch (action.type) {
     case FETCH_TODOS_SUCCESS:
@@ -7,6 +7,11 @@ const byId = (state = {}, action) => {
         nextState[todo.id] = todo;
       });
       return nextState;
+    case ADD_TODO_SUCCESS:
+      return {
+        ...state,
+        [action.response.id]: action.response
+      };
     default:
       return state;
   }
