@@ -23,9 +23,14 @@ const receiveTodos = (filter,response) =>({
   response
 });
 
-const fetchTodos = (filter) => 
-  api.fetchTodos(filter)
-    .then(response => receiveTodos(filter, response));
+const fetchTodos = (filter) => (dispatch) =>{
+  dispatch(requestTodos(filter));
+
+  return api.fetchTodos(filter)
+      .then(response => {
+        dispatch(receiveTodos(filter, response));
+      });
+}
 
 const requestTodos = (filter) => ({
   type: REQUEST_TODOS,
@@ -33,4 +38,4 @@ const requestTodos = (filter) => ({
 })
 
 export {ADD_TODO, TOGGLE_TODO, RECEIVE_TODOS, REQUEST_TODOS};
-export { addTodo, toggleTodo, receiveTodos, fetchTodos, requestTodos};
+export { addTodo, toggleTodo, receiveTodos, fetchTodos};
